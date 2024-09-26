@@ -8,7 +8,7 @@ st.logo('FooterLogo.png')
 # Define the query function using st.connections
 def run_query(query):
     # Create an SQL connection using the information from secrets
-    conn = st.connections.sqlconnection("mysql")
+    conn = st.connections.SQLConnection("mysql")
 
     # Execute the query and return the result as a DataFrame
     data = conn.query(query)
