@@ -13,10 +13,13 @@ def homepage_page():
 
 def challenge_progression_page():
     st.title("Challenge Progression Checks")
-    with st.connection("mysql") as conn:
-        query = "SELECT * FROM users"
-        df = pd.read_sql(query, conn)
-        st.dataframe(df)
+    # Initialize connection.
+    conn = st.connection('mysql', type='sql')
+
+    # Perform query.
+    df = conn.query('SELECT * FROM mytable;', ttl=600)
+
+    st.dataframe(df)
 
 def payout_check_page():
     st.title("Payout Checks")
