@@ -80,6 +80,8 @@ def login():
     if st.button("Login"):
         # Validate credentials and retrieve name
         name = check_login(username, password)
+        
+        # Check if credentials are valid
         if name:
             st.session_state["logged_in"] = True
             st.session_state["name"] = name
@@ -87,13 +89,10 @@ def login():
             
             # Redirect to the homepage by setting session state
             st.session_state["current_page"] = "Home"
-            
-            # Use st.rerun to trigger a rerun for redirection
             st.rerun()
         else:
-            st.error("Invalid username or password")
-
-
+            # Show error message when login fails
+            st.error("Incorrect username or password. Please try again.")
 
 # Main function
 def main():
