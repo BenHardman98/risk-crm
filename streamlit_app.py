@@ -7,14 +7,17 @@ try:
 
     # Initialize the authenticator using the 'usernames' key
     authenticator = stauth.Authenticate(
-        credentials['usernames'],
+        credentials['usernames'],  # Access the usernames key in the credentials
         cookie_name='user_auth',
         cookie_key='auth',
         cookie_expiry_days=30
     )
+except KeyError as e:
+    st.error(f"Error initializing authenticator: Missing key: {e}")
+    st.stop()  # Stop execution if authenticator initialization fails
 except Exception as e:
     st.error(f"Error initializing authenticator: {e}")
-    st.stop()  # Stop execution if authenticator initialization fails
+    st.stop()
 
 # User login
 name, authentication_status, username = authenticator.login('main')
