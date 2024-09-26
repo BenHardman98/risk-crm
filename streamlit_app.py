@@ -1,14 +1,14 @@
 import streamlit as st
 
-# Function to check user credentials and return the user's name
+# Function to check user credentials
 def check_login(username, password):
     # Retrieve credentials from st.secrets
     users = st.secrets["users"]
     
     # Check if the username exists and password matches
-    if username in users and users[username]["password"] == password:
-        return users[username]["name"]
-    return None
+    if username in users and users[username] == password:
+        return True
+    return False
 
 # Login page function
 def login():
@@ -21,11 +21,10 @@ def login():
     # If login button is clicked
     if st.button("Login"):
         # Validate credentials
-        user_name = check_login(username, password)
-        if user_name:
+        if check_login(username, password):
             st.session_state["logged_in"] = True
-            st.session_state["user_name"] = user_name
-            st.success(f"Logged in successfully as {user_name}!")
+            st.session_state["username"] = username
+            st.success("Logged in successfully!")
         else:
             st.error("Invalid username or password")
 
@@ -39,8 +38,8 @@ def main():
     if not st.session_state["logged_in"]:
         login()
     else:
-        # If logged in, show the main content with the user's name
-        st.title(f"Welcome {st.session_state['user_name']}!")
+        # If logged in, show the main content
+        st.title(f"Welcome {st.session_state['username']}!")
         st.write("This is the main app.")
         if st.button("Logout"):
             st.session_state["logged_in"] = False
