@@ -88,10 +88,11 @@ def login():
             # Redirect to the homepage by setting session state
             st.session_state["current_page"] = "Home"
             
-            # Trigger a rerun to update the page
-            st.experimental_rerun()
+            # Use st.rerun to trigger a rerun for redirection
+            st.rerun()
         else:
             st.error("Invalid username or password")
+
 
 
 # Main function
