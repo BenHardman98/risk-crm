@@ -6,9 +6,6 @@ import sqlalchemy
 st.set_page_config(layout="wide")
 st.logo('FooterLogo.png')
 
-# Initialize the MySQL connection using st.connection
-conn = st.connection('mysql', type='sql')
-
 def homepage_page():
     # Access the user's name from session state
     name = st.session_state.get("name", "User")
@@ -17,9 +14,10 @@ def homepage_page():
 
 def challenge_progression_page():
     st.title("Challenge Progression Checks")
-    query = "SELECT * FROM users"
-    df = conn.query('SELECT * FROM your_table_name;', ttl=600)
-    st.dataframe(df)
+    with st.connection("mysql") as conn:
+        query = "SELECT * FROM users"
+        df = pd.read_sql(query, conn)
+        st.dataframe(df)
 
 def payout_check_page():
     st.title("Payout Checks")
