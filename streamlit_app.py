@@ -1,17 +1,23 @@
 import streamlit as st
-import yaml
 import streamlit_authenticator as stauth
 
-# Load config from YAML file
-try:
-    with open('config.yaml') as file:
-        config = yaml.safe_load(file)
-except Exception as e:
-    st.error(f"Error loading YAML file: {e}")
+# Access the credentials from Streamlit secrets
+credentials = st.secrets["credentials"]
+
+# Prepare the credential format for the authenticator
+users = {
+    username: {
+        'name': credentials[username]['name'],
+        'password': credentials[username]['password'],
+        'accounts': credentials[username].get('accounts', [])
+    }
+    for username in credentials
+}
+
 # Initialize the authenticator
 try:
     authenticator = stauth.Authenticate(
-        config['credentials'],
+        users,
         cookie_name='user_auth',
         cookie_key='auth',
         cookie_expiry_days=30
@@ -23,6 +29,7 @@ except Exception as e:
 name, authentication_status, username = authenticator.login('main')
 
 if authentication_status:
+    # Define pages as you did before
     def homepage_page():
         st.title(f"Welcome, {name}!")
         st.markdown("This is your homepage.")
@@ -41,22 +48,18 @@ if authentication_status:
 
     def logout_page():
         st.title(f"Logout")
-        # Check if the user is logged out in session state
         if 'logged_out' not in st.session_state:
             st.session_state.logged_out = False
 
-        # If user is not logged out, show confirmation message
         if not st.session_state.logged_out:
             st.write(f"Are you sure you want to log out?")
-            # Logout button
             if authenticator.logout('Logout', 'main'):
-                # Update session state to reflect the logout
                 st.session_state.logged_out = True
 
-        # If the user has logged out, show the goodbye message
         if st.session_state.logged_out:
             st.write(f"Goodbye {name}, you have been logged out.")
 
+    # Define pages and sections
     homepage = st.Page(page=homepage_page, title="Homepage", icon=":material/home:")
     challenges = st.Page(page=challenge_progression_page, title="Challenge Progression Checks", icon=":material/query_stats:")
     payouts = st.Page(page=payout_check_page, title="Challenge Payout Checks", icon=":material/mintmark:")
@@ -64,18 +67,13 @@ if authentication_status:
     spreads = st.Page(page=spread_trading_page, title="Spread Trading", icon=":material/ssid_chart:")
     logout = st.Page(page=logout_page, title="Logout", icon=":material/logout:")
 
-
-    # Group pages into sections
     pages = {
         "Home": [homepage],
         "Tools": [challenges, payouts, adhoc, spreads],
-        "Logout": [logout]  # Logout page added here
+        "Logout": [logout]
     }
 
-    # Create the navigation menu
     selected_page = st.navigation(pages, position="sidebar")
-
-    # Run the selected page
     selected_page.run()
 
 elif authentication_status == False:
@@ -83,4 +81,3 @@ elif authentication_status == False:
 
 elif authentication_status == None:
     st.warning("Please enter your username and password")
-
