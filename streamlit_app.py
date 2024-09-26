@@ -1,8 +1,18 @@
 import streamlit as st
+import pandas as pd
 
 # Set page configuration to wide mode
 st.set_page_config(layout="wide")
 st.logo('FooterLogo.png')
+
+# Define the query function using st.connections
+def run_query(query):
+    # Create an SQL connection using the information from secrets
+    conn = st.connections.sqlconnection("mysql")
+
+    # Execute the query and return the result as a DataFrame
+    data = conn.query(query)
+    return pd.DataFrame(data)
 
 def homepage_page():
     # Access the user's name from session state
@@ -12,7 +22,9 @@ def homepage_page():
 
 def challenge_progression_page():
     st.title("Challenge Progression Checks")
-    st.write("Enter an account below to generate a report:")
+    query = "SELECT * FROM users"
+    result_df = run_query(query)
+    st.dataframe(result_df)
 
 def payout_check_page():
     st.title("Payout Checks")
