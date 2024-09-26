@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # Set page configuration to wide mode
 st.set_page_config(layout="wide")
