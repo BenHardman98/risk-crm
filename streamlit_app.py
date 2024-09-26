@@ -4,20 +4,22 @@ import streamlit_authenticator as stauth
 # Access the credentials from Streamlit secrets
 credentials = st.secrets["credentials"]
 
-# Construct the user credentials dictionary
+# Prepare the credentials in the correct format
 try:
     users = {
-        username: {
-            'name': credentials[username]['name'],
-            'password': credentials[username]['password'],
-            'accounts': credentials[username].get('accounts', [])
+        'usernames': {
+            username: {
+                'name': credentials[username]['name'],
+                'password': credentials[username]['password'],
+                'accounts': credentials[username].get('accounts', [])
+            }
+            for username in credentials
         }
-        for username in credentials
     }
 
     # Initialize the authenticator
     authenticator = stauth.Authenticate(
-        users,
+        users['usernames'],
         cookie_name='user_auth',
         cookie_key='auth',
         cookie_expiry_days=30
