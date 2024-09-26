@@ -1,77 +1,50 @@
 import streamlit as st
-import streamlit_authenticator as stauth
 
-# Access the credentials from Streamlit secrets
-try:
-    credentials = st.secrets["credentials"]
+# Function to check user credentials and return the user's name
+def check_login(username, password):
+    # Retrieve credentials from st.secrets
+    users = st.secrets["users"]
+    
+    # Check if the username exists and password matches
+    if username in users and users[username]["password"] == password:
+        return users[username]["name"]
+    return None
 
-    # Initialize the authenticator using the 'usernames' key
-    authenticator = stauth.Authenticate(
-        credentials['usernames'],  # Access the usernames key in the credentials
-        cookie_name='user_auth',
-        cookie_key='auth',
-        cookie_expiry_days=30
-    )
-except KeyError as e:
-    st.error(f"Error initializing authenticator: Missing key: {e}")
-    st.stop()  # Stop execution if authenticator initialization fails
-except Exception as e:
-    st.error(f"Error initializing authenticator: {e}")
-    st.stop()
+# Login page function
+def login():
+    st.title("Login")
 
-# User login
-name, authentication_status, username = authenticator.login('main')
+    # Create login form
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    
+    # If login button is clicked
+    if st.button("Login"):
+        # Validate credentials
+        user_name = check_login(username, password)
+        if user_name:
+            st.session_state["logged_in"] = True
+            st.session_state["user_name"] = user_name
+            st.success(f"Logged in successfully as {user_name}!")
+        else:
+            st.error("Invalid username or password")
 
-if authentication_status:
-    # Define pages as you did before
-    def homepage_page():
-        st.title(f"Welcome, {name}!")
-        st.markdown("This is your homepage.")
+# Main function
+def main():
+    # Check if user is already logged in
+    if "logged_in" not in st.session_state:
+        st.session_state["logged_in"] = False
 
-    def challenge_progression_page():
-        st.title(f"Challenge Checks")
+    # If not logged in, show login page
+    if not st.session_state["logged_in"]:
+        login()
+    else:
+        # If logged in, show the main content with the user's name
+        st.title(f"Welcome {st.session_state['user_name']}!")
+        st.write("This is the main app.")
+        if st.button("Logout"):
+            st.session_state["logged_in"] = False
 
-    def payout_check_page():
-        st.title(f"Payout Checks")
-
-    def adhoc_review_page():
-        st.title(f"Adhoc Reviews")
-
-    def spread_trading_page():
-        st.title(f"Spread Trading")
-
-    def logout_page():
-        st.title(f"Logout")
-        if 'logged_out' not in st.session_state:
-            st.session_state.logged_out = False
-
-        if not st.session_state.logged_out:
-            st.write(f"Are you sure you want to log out?")
-            if authenticator.logout('Logout', 'main'):
-                st.session_state.logged_out = True
-
-        if st.session_state.logged_out:
-            st.write(f"Goodbye {name}, you have been logged out.")
-
-    # Define pages and sections
-    homepage = st.Page(page=homepage_page, title="Homepage", icon=":material/home:")
-    challenges = st.Page(page=challenge_progression_page, title="Challenge Progression Checks", icon=":material/query_stats:")
-    payouts = st.Page(page=payout_check_page, title="Challenge Payout Checks", icon=":material/mintmark:")
-    adhoc = st.Page(page=adhoc_review_page, title="Adhoc Reviews", icon=":material/person_search:")
-    spreads = st.Page(page=spread_trading_page, title="Spread Trading", icon=":material/ssid_chart:")
-    logout = st.Page(page=logout_page, title="Logout", icon=":material/logout:")
-
-    pages = {
-        "Home": [homepage],
-        "Tools": [challenges, payouts, adhoc, spreads],
-        "Logout": [logout]
-    }
-
-    selected_page = st.navigation(pages, position="sidebar")
-    selected_page.run()
-
-elif authentication_status == False:
-    st.error("Username/password is incorrect")
-
-elif authentication_status == None:
-    st.warning("Please enter your username and password")
+# Run the app
+if __name__ == "__main__":
+    main()
