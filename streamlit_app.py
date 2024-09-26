@@ -1,5 +1,6 @@
 import streamlit as st
 import yaml
+import streamlit_authenticator as stauth
 
 # Load config from YAML file
 try:
