@@ -2,6 +2,7 @@ import streamlit as st
 
 # Set page configuration to wide mode
 st.set_page_config(layout="wide")
+st.logo('FooterLogo.png')
 
 def homepage_page():
     # Access the user's name from session state
