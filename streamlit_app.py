@@ -1,5 +1,5 @@
 import streamlit as st
-import yaml
+import PyYAML as yaml
 import streamlit_authenticator as stauth
 
 # Load config from YAML file
